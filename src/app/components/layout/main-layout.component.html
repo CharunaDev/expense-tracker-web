@@ -1,0 +1,113 @@
+<div class="app-shell">
+
+  <!-- ══════════════════════════════════════════
+       MOBILE TOP BAR (hidden on desktop)
+  ══════════════════════════════════════════ -->
+  <header class="mobile-topbar lg:hidden">
+    <button (click)="toggleMobileMenu()" class="icon-btn" aria-label="Open menu">
+      <i class="pi pi-bars"></i>
+    </button>
+
+    <div class="brand-mark">
+      <span class="brand-dot"></span>
+      <span class="brand-name">MyWallet</span>
+    </div>
+
+    <div class="relative">
+      <button (click)="toggleUserMenu()" class="avatar-btn" aria-label="User menu">
+        <span>{{ currentUser?.displayName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+      </button>
+
+      <div *ngIf="showUserMenu" class="user-dropdown">
+        <div class="user-dropdown__header">
+          <p class="user-dropdown__name">{{ currentUser?.displayName }}</p>
+          <p class="user-dropdown__email">{{ currentUser?.email }}</p>
+        </div>
+        <button (click)="logout()" class="user-dropdown__logout">
+          <i class="pi pi-sign-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       MOBILE OVERLAY
+  ══════════════════════════════════════════ -->
+  <div *ngIf="mobileMenuOpen"
+       class="sidebar-overlay lg:hidden"
+       (click)="closeMobileMenu()"
+       aria-hidden="true">
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════ -->
+  <aside [class]="'sidebar ' + (mobileMenuOpen ? 'sidebar--open' : '')">
+
+    <!-- Brand -->
+    <div class="sidebar__brand">
+      <div class="sidebar__logo">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div>
+        <p class="sidebar__app-name">MyWallet</p>
+        <p class="sidebar__app-sub">Expense Tracker</p>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="sidebar__nav" role="navigation">
+      <p class="sidebar__section-label">Menu</p>
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.path"
+         routerLinkActive="sidebar__link--active"
+         [routerLinkActiveOptions]="{exact: true}"
+         (click)="closeMobileMenu()"
+         class="sidebar__link">
+        <span class="sidebar__link-icon">
+          <i [class]="item.icon"></i>
+        </span>
+        <span class="sidebar__link-label">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <!-- User panel (desktop) -->
+    <div class="sidebar__user hidden lg:flex">
+      <div class="sidebar__user-avatar">
+        {{ currentUser?.displayName?.charAt(0)?.toUpperCase() || 'U' }}
+      </div>
+      <div class="sidebar__user-info">
+        <p class="sidebar__user-name">{{ currentUser?.displayName }}</p>
+        <p class="sidebar__user-email">{{ currentUser?.email }}</p>
+      </div>
+      <button (click)="logout()" class="sidebar__logout-btn" aria-label="Logout">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════ -->
+  <main class="main-content">
+    <div class="page-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     BOTTOM NAV (mobile only)
+══════════════════════════════════════════ -->
+<nav class="bottom-nav lg:hidden" role="navigation" aria-label="Main navigation">
+  <a *ngFor="let item of navItems.slice(0, 5)"
+     [routerLink]="item.path"
+     routerLinkActive="bottom-nav__item--active"
+     [routerLinkActiveOptions]="{exact: true}"
+     class="bottom-nav__item">
+    <i [class]="item.icon + ' bottom-nav__icon'"></i>
+    <span class="bottom-nav__label">{{ item.label }}</span>
+  </a>
+</nav>

@@ -1,0 +1,182 @@
+<div class="animate-in">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Expenses</h1>
+      <p class="page-subtitle">Track and manage your spending</p>
+    </div>
+    <button (click)="openExpenseModal()" class="btn btn-primary">
+      <i class="pi pi-plus"></i>
+      <span>Add</span>
+    </button>
+  </div>
+
+  <!-- ── Summary Cards ── -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+    <div class="stat-mini">
+      <div class="stat-mini__icon-wrap icon-red"><i class="pi pi-arrow-down"></i></div>
+      <div class="stat-mini__label">Total</div>
+      <div class="stat-mini__value" style="font-size:18px;">${{ totalExpenses | number:'1.2-2' }}</div>
+    </div>
+    <div class="stat-mini">
+      <div class="stat-mini__icon-wrap icon-amber"><i class="pi pi-chart-bar"></i></div>
+      <div class="stat-mini__label">Daily Avg</div>
+      <div class="stat-mini__value" style="font-size:18px;">${{ averagePerDay | number:'1.2-2' }}</div>
+    </div>
+    <div class="stat-mini">
+      <div class="stat-mini__icon-wrap icon-brand"><i class="pi pi-arrow-up-right"></i></div>
+      <div class="stat-mini__label">Highest</div>
+      <div class="stat-mini__value" style="font-size:18px;">${{ highestExpense | number:'1.2-2' }}</div>
+    </div>
+    <div class="stat-mini">
+      <div class="stat-mini__icon-wrap icon-green"><i class="pi pi-list"></i></div>
+      <div class="stat-mini__label">Transactions</div>
+      <div class="stat-mini__value" style="font-size:18px;">{{ expenses.length }}</div>
+    </div>
+  </div>
+
+  <!-- ── Filters ── -->
+  <div class="card card-sm" style="margin-bottom:16px;">
+    <div class="filter-bar">
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">From</label>
+        <input type="date" [(ngModel)]="filters.startDate" (change)="loadExpenses()" class="form-control">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">To</label>
+        <input type="date" [(ngModel)]="filters.endDate" (change)="loadExpenses()" class="form-control">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Category</label>
+        <select [(ngModel)]="filters.categoryId" (change)="loadExpenses()" class="form-control">
+          <option [value]="null">All</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Account</label>
+        <select [(ngModel)]="filters.accountId" (change)="loadExpenses()" class="form-control">
+          <option [value]="null">All</option>
+          <option *ngFor="let acc of accounts" [value]="acc.id">{{ acc.name }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Expense List ── -->
+  <div class="card">
+    <div *ngIf="expenses.length > 0">
+      <div *ngFor="let expense of expenses" class="txn-row">
+        <div class="txn-icon icon-red">
+          <i class="pi pi-shopping-cart"></i>
+        </div>
+        <div class="txn-info">
+          <div class="txn-name">{{ expense.merchantName }}</div>
+          <div class="txn-meta">
+            {{ expense.expenseDate | date:'MMM d, yyyy' }} &bull;
+            <span class="badge badge-blue" style="padding:1px 6px; font-size:10px;">{{ expense.category?.name }}</span>
+            <span style="margin-left:4px; color:var(--gray-400);">{{ expense.account?.name }}</span>
+          </div>
+          <div *ngIf="expense.note" class="txn-meta" style="margin-top:2px; font-style:italic;">{{ expense.note }}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;">
+          <div class="txn-amount txn-amount--out">-${{ expense.amount | number:'1.2-2' }}</div>
+          <div style="display:flex; gap:4px;">
+            <button (click)="editExpense(expense)" class="btn-icon" aria-label="Edit">
+              <i class="pi pi-pencil" style="font-size:14px; color:var(--brand-500);"></i>
+            </button>
+            <button (click)="deleteExpense(expense.id)" class="btn-icon" aria-label="Delete">
+              <i class="pi pi-trash" style="font-size:14px; color:var(--danger-text);"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="expenses.length === 0" class="empty-state">
+      <div class="empty-state__icon"><i class="pi pi-receipt"></i></div>
+      <div class="empty-state__title">No expenses found</div>
+      <div class="empty-state__desc">Start tracking your spending</div>
+      <button (click)="openExpenseModal()" class="btn btn-primary">
+        <i class="pi pi-plus"></i> Add Expense
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     EXPENSE MODAL (bottom sheet on mobile)
+══════════════════════════════════════════ -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModalOnBackdrop($event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="modal-header">
+      <h3 class="modal-title">{{ editingExpense ? 'Edit Expense' : 'New Expense' }}</h3>
+      <button (click)="closeModal()" class="btn-icon" aria-label="Close">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="expenseForm" (ngSubmit)="saveExpense()">
+      <div class="modal-body">
+
+        <!-- Amount — large centered input -->
+        <div style="text-align:center; margin-bottom:24px;">
+          <label class="form-label" style="text-align:center; display:block; margin-bottom:8px;">Amount</label>
+          <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
+            <span style="font-size:28px; font-weight:600; color:var(--gray-400);">$</span>
+            <input type="number"
+                   formControlName="amount"
+                   placeholder="0.00"
+                   step="0.01"
+                   style="width:160px; text-align:center; font-size:32px; font-family:var(--font-heading); font-weight:700; background:none; border:none; border-bottom:2px solid var(--brand-400); outline:none; padding:4px 0; color:var(--gray-900);">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Merchant *</label>
+          <input type="text" formControlName="merchantName" class="form-control" placeholder="Where did you spend?">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input type="date" formControlName="expenseDate" class="form-control">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select formControlName="categoryId" class="form-control">
+              <option value="">Select...</option>
+              <option *ngFor="let cat of expenseCategories" [value]="cat.id">{{ cat.name }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Account *</label>
+            <select formControlName="accountId" class="form-control">
+              <option value="">Select...</option>
+              <option *ngFor="let acc of accounts" [value]="acc.id">{{ acc.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Note</label>
+          <textarea formControlName="note" class="form-control" rows="2" placeholder="Optional note..."></textarea>
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeModal()" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="expenseForm.invalid">
+          {{ editingExpense ? 'Update' : 'Save Expense' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

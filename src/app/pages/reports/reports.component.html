@@ -1,0 +1,128 @@
+<div class="animate-in">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reports</h1>
+      <p class="page-subtitle">Analyze your finances</p>
+    </div>
+  </div>
+
+  <!-- ── Date Range + Controls ── -->
+  <div class="card card-sm" style="margin-bottom:16px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">From</label>
+        <input type="date" [(ngModel)]="startDate" class="form-control">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">To</label>
+        <input type="date" [(ngModel)]="endDate" class="form-control">
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <select [(ngModel)]="reportType" class="form-control" style="flex:1;">
+        <option value="all">All Transactions</option>
+        <option value="expense">Expenses Only</option>
+        <option value="income">Incomes Only</option>
+      </select>
+      <button (click)="generateReport()" class="btn btn-primary" style="white-space:nowrap; flex-shrink:0;">
+        <i class="pi pi-chart-bar"></i>
+        <span>Generate</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Results ── -->
+  <div *ngIf="reportData" class="animate-in">
+
+    <!-- Summary cards -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+
+      <div class="stat-mini">
+        <div class="stat-mini__icon-wrap icon-green"><i class="pi pi-arrow-up"></i></div>
+        <div class="stat-mini__label">Total Income</div>
+        <div class="stat-mini__value" style="font-size:18px;">${{ reportData.totalIncomes | number:'1.2-2' }}</div>
+      </div>
+
+      <div class="stat-mini">
+        <div class="stat-mini__icon-wrap icon-red"><i class="pi pi-arrow-down"></i></div>
+        <div class="stat-mini__label">Total Expenses</div>
+        <div class="stat-mini__value" style="font-size:18px;">${{ reportData.totalExpenses | number:'1.2-2' }}</div>
+      </div>
+
+      <div class="stat-mini">
+        <div class="stat-mini__icon-wrap"
+             [class.icon-green]="reportData.netSavings >= 0"
+             [class.icon-red]="reportData.netSavings < 0">
+          <i class="pi pi-wallet"></i>
+        </div>
+        <div class="stat-mini__label">Net Savings</div>
+        <div class="stat-mini__value" style="font-size:18px;"
+             [style.color]="reportData.netSavings >= 0 ? 'var(--success-text)' : 'var(--danger-text)'">
+          ${{ reportData.netSavings | number:'1.2-2' }}
+        </div>
+      </div>
+
+      <div class="stat-mini">
+        <div class="stat-mini__icon-wrap icon-brand"><i class="pi pi-percentage"></i></div>
+        <div class="stat-mini__label">Savings Rate</div>
+        <div class="stat-mini__value" style="font-size:18px;">{{ getSavingsRate() }}%</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div style="display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:16px;">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px;">Expenses by Category</div>
+        <canvas #expenseChart></canvas>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px;">Incomes by Category</div>
+        <canvas #incomeChart></canvas>
+      </div>
+    </div>
+
+    <!-- Transactions table -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:16px;">Transaction Details</div>
+
+      <!-- Expenses -->
+      <div *ngIf="reportData.expenses?.length > 0">
+        <div style="font-size:11px; font-weight:700; color:var(--gray-400); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px;">
+          EXPENSES
+        </div>
+        <div *ngFor="let expense of reportData.expenses" class="txn-row">
+          <div class="txn-icon icon-red" style="width:36px; height:36px; font-size:14px; flex-shrink:0;">
+            <i class="pi pi-arrow-down"></i>
+          </div>
+          <div class="txn-info">
+            <div class="txn-name">{{ expense.merchantName }}</div>
+            <div class="txn-meta">{{ expense.expenseDate | date:'MMM d' }} &bull; {{ expense.category?.name }} &bull; {{ expense.account?.name }}</div>
+          </div>
+          <div class="txn-amount txn-amount--out">-${{ expense.amount | number:'1.2-2' }}</div>
+        </div>
+      </div>
+
+      <!-- Incomes -->
+      <div *ngIf="reportData.incomes?.length > 0" [style.margin-top]="reportData.expenses?.length ? '16px' : '0'">
+        <div style="font-size:11px; font-weight:700; color:var(--gray-400); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px;">
+          INCOMES
+        </div>
+        <div *ngFor="let income of reportData.incomes" class="txn-row">
+          <div class="txn-icon icon-green" style="width:36px; height:36px; font-size:14px; flex-shrink:0;">
+            <i class="pi pi-arrow-up"></i>
+          </div>
+          <div class="txn-info">
+            <div class="txn-name">{{ income.note || 'Income' }}</div>
+            <div class="txn-meta">{{ income.incomeDate | date:'MMM d' }} &bull; {{ income.category?.name }} &bull; {{ income.account?.name }}</div>
+          </div>
+          <div class="txn-amount txn-amount--in">+${{ income.amount | number:'1.2-2' }}</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /reportData -->
+
+</div>

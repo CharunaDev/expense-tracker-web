@@ -1,0 +1,140 @@
+<!-- ══════════════════════════════════════════════════════
+     LOGIN — login.component.html
+══════════════════════════════════════════════════════ -->
+<div style="min-height:100vh; background:var(--surface-page); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 16px;">
+
+  <!-- Brand -->
+  <div style="text-align:center; margin-bottom:32px;">
+    <div style="width:64px; height:64px; background:var(--brand-600); border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 8px 24px rgba(79,70,229,0.3);">
+      <i class="pi pi-wallet" style="font-size:28px; color:white;"></i>
+    </div>
+    <h1 style="font-family:var(--font-heading); font-size:28px; font-weight:700; color:var(--gray-900); letter-spacing:-0.03em;">MyWallet</h1>
+    <p style="font-size:14px; color:var(--gray-500); margin-top:4px;">Your smart expense tracker</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card" style="width:100%; max-width:400px;">
+    <h2 style="font-family:var(--font-heading); font-size:20px; font-weight:700; color:var(--gray-900); margin-bottom:24px;">Welcome back</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input type="email"
+               formControlName="email"
+               class="form-control"
+               [class.is-invalid]="email?.invalid && email?.touched"
+               placeholder="you@example.com"
+               autocomplete="email">
+        <div *ngIf="email?.invalid && email?.touched" class="form-error">
+          <i class="pi pi-exclamation-circle" style="font-size:12px;"></i> Valid email required
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:24px;">
+        <label class="form-label">Password</label>
+        <input type="password"
+               formControlName="password"
+               class="form-control"
+               [class.is-invalid]="password?.invalid && password?.touched"
+               placeholder="Enter your password"
+               autocomplete="current-password">
+        <div *ngIf="password?.invalid && password?.touched" class="form-error">
+          <i class="pi pi-exclamation-circle" style="font-size:12px;"></i> Password required
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:13px;" [disabled]="loginForm.invalid || isLoading">
+        <i class="pi" [class.pi-sign-in]="!isLoading" [class.pi-spin]="isLoading" [class.pi-spinner]="isLoading"></i>
+        {{ isLoading ? 'Signing in...' : 'Sign in' }}
+      </button>
+
+    </form>
+
+    <div style="margin-top:20px; text-align:center; font-size:14px; color:var(--gray-500);">
+      No account? <a routerLink="/register" style="color:var(--brand-600); font-weight:600; text-decoration:none;">Create one →</a>
+    </div>
+  </div>
+
+  <!-- Demo hint -->
+  <div style="margin-top:20px; text-align:center; font-size:12px; color:var(--gray-400); background:var(--gray-100); padding:10px 16px; border-radius:var(--radius-pill);">
+    Demo: demo@example.com / demo123
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     REGISTER — register.component.html
+     (put below or in a separate file)
+══════════════════════════════════════════════════════ -->
+<!--
+<div style="min-height:100vh; background:var(--surface-page); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 16px;">
+
+  <div style="text-align:center; margin-bottom:32px;">
+    <div style="width:64px; height:64px; background:var(--brand-600); border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 8px 24px rgba(79,70,229,0.3);">
+      <i class="pi pi-wallet" style="font-size:28px; color:white;"></i>
+    </div>
+    <h1 style="font-family:var(--font-heading); font-size:28px; font-weight:700; color:var(--gray-900); letter-spacing:-0.03em;">MyWallet</h1>
+    <p style="font-size:14px; color:var(--gray-500); margin-top:4px;">Create your free account</p>
+  </div>
+
+  <div class="card" style="width:100%; max-width:400px;">
+    <h2 style="font-family:var(--font-heading); font-size:20px; font-weight:700; color:var(--gray-900); margin-bottom:24px;">Get started</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label class="form-label">Display Name</label>
+        <input type="text" formControlName="displayName" class="form-control"
+               [class.is-invalid]="displayName?.invalid && displayName?.touched"
+               placeholder="How should we call you?" autocomplete="name">
+        <div *ngIf="displayName?.invalid && displayName?.touched" class="form-error">
+          <i class="pi pi-exclamation-circle" style="font-size:12px;"></i> Name required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input type="email" formControlName="email" class="form-control"
+               [class.is-invalid]="email?.invalid && email?.touched"
+               placeholder="you@example.com" autocomplete="email">
+        <div *ngIf="email?.invalid && email?.touched" class="form-error">
+          <i class="pi pi-exclamation-circle" style="font-size:12px;"></i> Valid email required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" formControlName="password" class="form-control"
+               [class.is-invalid]="password?.invalid && password?.touched"
+               placeholder="At least 6 characters" autocomplete="new-password">
+        <div *ngIf="password?.invalid && password?.touched" class="form-error">
+          <i class="pi pi-exclamation-circle" style="font-size:12px;"></i> Minimum 6 characters
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:24px;">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" formControlName="confirmPassword" class="form-control"
+               [class.is-invalid]="registerForm.errors?.['mismatch'] && confirmPassword?.touched"
+               placeholder="Repeat your password" autocomplete="new-password">
+        <div *ngIf="registerForm.errors?.['mismatch'] && confirmPassword?.touched" class="form-error">
+          <i class="pi pi-exclamation-circle" style="font-size:12px;"></i> Passwords don't match
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:13px;" [disabled]="registerForm.invalid || isLoading">
+        <i class="pi" [class.pi-user-plus]="!isLoading" [class.pi-spin]="isLoading" [class.pi-spinner]="isLoading"></i>
+        {{ isLoading ? 'Creating account...' : 'Create Account' }}
+      </button>
+
+    </form>
+
+    <div style="margin-top:20px; text-align:center; font-size:14px; color:var(--gray-500);">
+      Already have an account? <a routerLink="/login" style="color:var(--brand-600); font-weight:600; text-decoration:none;">Sign in →</a>
+    </div>
+  </div>
+
+</div>
+-->

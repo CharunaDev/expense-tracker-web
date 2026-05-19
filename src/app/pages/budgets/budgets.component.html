@@ -1,0 +1,151 @@
+<div class="animate-in">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Budgets</h1>
+      <p class="page-subtitle">Monthly spending limits</p>
+    </div>
+    <button (click)="openBudgetModal()" class="btn btn-primary">
+      <i class="pi pi-plus"></i>
+      <span>Add</span>
+    </button>
+  </div>
+
+  <!-- Month / Year Picker -->
+  <div class="card card-sm" style="margin-bottom:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <i class="pi pi-calendar" style="color:var(--gray-400);"></i>
+    <select [(ngModel)]="selectedMonth" (change)="loadBudgets()" class="form-control" style="flex:1; min-width:130px; max-width:180px;">
+      <option *ngFor="let m of months" [value]="m.value">{{ m.name }}</option>
+    </select>
+    <select [(ngModel)]="selectedYear" (change)="loadBudgets()" class="form-control" style="width:100px;">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+  </div>
+
+  <!-- ── Summary Row ── -->
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px;">
+    <div class="stat-mini card-sm" style="padding:14px;">
+      <div class="stat-mini__icon-wrap icon-brand" style="width:30px; height:30px; font-size:13px;"><i class="pi pi-chart-line"></i></div>
+      <div class="stat-mini__label" style="font-size:11px;">Budget</div>
+      <div style="font-family:var(--font-heading); font-size:16px; font-weight:700; color:var(--gray-900);">${{ totalBudget | number:'1.0-0' }}</div>
+    </div>
+    <div class="stat-mini card-sm" style="padding:14px;">
+      <div class="stat-mini__icon-wrap icon-red" style="width:30px; height:30px; font-size:13px;"><i class="pi pi-arrow-down"></i></div>
+      <div class="stat-mini__label" style="font-size:11px;">Spent</div>
+      <div style="font-family:var(--font-heading); font-size:16px; font-weight:700; color:var(--gray-900);">${{ totalSpent | number:'1.0-0' }}</div>
+    </div>
+    <div class="stat-mini card-sm" style="padding:14px;"
+         [style.border-color]="remainingBudget >= 0 ? 'var(--gray-200)' : 'var(--danger-500)'">
+      <div class="stat-mini__icon-wrap" style="width:30px; height:30px; font-size:13px;"
+           [class.icon-green]="remainingBudget >= 0"
+           [class.icon-red]="remainingBudget < 0">
+        <i class="pi pi-check" *ngIf="remainingBudget >= 0"></i>
+        <i class="pi pi-exclamation-triangle" *ngIf="remainingBudget < 0"></i>
+      </div>
+      <div class="stat-mini__label" style="font-size:11px;">Left</div>
+      <div style="font-family:var(--font-heading); font-size:16px; font-weight:700;"
+           [style.color]="remainingBudget >= 0 ? 'var(--success-text)' : 'var(--danger-text)'">${{ remainingBudget | number:'1.0-0' }}</div>
+    </div>
+  </div>
+
+  <!-- ── Budget Items ── -->
+  <div class="card" *ngIf="budgets.length > 0">
+    <div *ngFor="let budget of budgets; let last = last"
+         [style.padding-bottom]="last ? '0' : '20px'"
+         [style.margin-bottom]="last ? '0' : '20px'"
+         [style.border-bottom]="last ? 'none' : '1px solid var(--gray-100)'">
+
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; gap:8px;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-weight:700; font-size:15px; color:var(--gray-900); margin-bottom:2px; font-family:var(--font-heading);">
+            {{ budget.category?.name }}
+          </div>
+          <div style="font-size:12px; color:var(--gray-500);">
+            ${{ budget.spentAmount | number:'1.2-2' }} of ${{ budget.budgetAmount | number:'1.2-2' }}
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+          <!-- Remaining pill -->
+          <span class="badge"
+                [class.badge-green]="getRemainingBudget(budget) >= 0"
+                [class.badge-red]="getRemainingBudget(budget) < 0">
+            ${{ getRemainingBudget(budget) | number:'1.0-0' }} left
+          </span>
+          <button (click)="editBudget(budget)" class="btn-icon" aria-label="Edit">
+            <i class="pi pi-pencil" style="font-size:13px; color:var(--brand-500);"></i>
+          </button>
+          <button (click)="deleteBudget(budget.id)" class="btn-icon" aria-label="Delete">
+            <i class="pi pi-trash" style="font-size:13px; color:var(--danger-text);"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-track">
+        <div class="progress-fill"
+             [style.width.%]="getPercentage(budget)"
+             [style.background]="getPercentage(budget) <= 70 ? 'var(--success-500)' : getPercentage(budget) <= 90 ? 'var(--warning-500)' : 'var(--danger-500)'">
+        </div>
+      </div>
+      <div style="font-size:11px; color:var(--gray-400); margin-top:5px;">{{ getPercentage(budget) | number:'1.0-0' }}% used</div>
+
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="budgets.length === 0" class="card">
+    <div class="empty-state">
+      <div class="empty-state__icon"><i class="pi pi-chart-line"></i></div>
+      <div class="empty-state__title">No budgets for this month</div>
+      <div class="empty-state__desc">Set spending limits by category</div>
+      <button (click)="openBudgetModal()" class="btn btn-primary">
+        <i class="pi pi-plus"></i> Create Budget
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     BUDGET MODAL
+══════════════════════════════════════════ -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModalOnBackdrop($event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="modal-header">
+      <h3 class="modal-title">{{ editingBudget ? 'Edit Budget' : 'Set Budget' }}</h3>
+      <button (click)="closeModal()" class="btn-icon" aria-label="Close">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="budgetForm" (ngSubmit)="saveBudget()">
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select formControlName="categoryId" class="form-control">
+            <option value="">Select a category...</option>
+            <option *ngFor="let cat of expenseCategories" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Budget Amount *</label>
+          <input type="number" formControlName="budgetAmount" class="form-control" placeholder="0.00">
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeModal()" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="budgetForm.invalid">
+          {{ editingBudget ? 'Update' : 'Save Budget' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
