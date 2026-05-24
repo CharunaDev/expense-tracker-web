@@ -6,12 +6,13 @@ import { delay } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { Category, Account, Expense, Income, MonthlyBudget, Receipt } from '../models/expense.model';
 import { LoginRequest, AuthResponse, RegisterRequest } from '../models/user.model';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = '/api';
+  private baseUrl = environment.apiUrl;
   private mockData: any;
   private isBrowser: boolean;
 

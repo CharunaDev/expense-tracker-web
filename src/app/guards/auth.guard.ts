@@ -1,18 +1,33 @@
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+// src/app/guards/auth.guard.ts
+import { Injectable, Inject, PLATFORM_ID } from "@angular/core";
+import { Router, CanActivate } from "@angular/router";
+import { AuthService } from "../services/auth.service";
+import { isPlatformBrowser } from "@angular/common";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-export class AuthGuard {
-  constructor(private authService: AuthService, private router: Router) {}
+export class AuthGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object,
+  ) {}
 
   canActivate(): boolean {
+    // For server-side rendering, allow access to avoid rendering issues
+    // The actual auth check will happen on the client
+    if (!isPlatformBrowser(this.platformId)) {
+      return true;
+    }
+
+    // Client-side: perform actual auth check
     if (this.authService.isAuthenticated()) {
       return true;
     }
-    this.router.navigate(['/login']);
+
+    // Not authenticated, redirect to login
+    this.router.navigate(["/login"]);
     return false;
   }
 }

@@ -1,5 +1,4 @@
 <div class="animate-in">
-
   <!-- Page Header -->
   <div class="page-header">
     <div>
@@ -8,28 +7,64 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+    <div class="text-center">
+      <div
+        class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading dashboard...</p>
+    </div>
+  </div>
+
   <!-- ── Hero Balance Card ── -->
-  <div class="stat-hero" style="margin-bottom: 16px;">
+  <div class="stat-hero" style="margin-bottom: 16px">
     <div class="stat-hero__label">Total Balance</div>
-    <div class="stat-hero__value">${{ stats.currentBalance | number:'1.2-2' }}</div>
+    <div class="stat-hero__value">
+      ${{ stats.currentBalance | number: "1.2-2" }}
+    </div>
     <div class="stat-hero__change">
-      <i class="pi pi-calendar" style="font-size:12px; opacity:0.7; margin-right:4px;"></i>
+      <i
+        class="pi pi-calendar"
+        style="font-size: 12px; opacity: 0.7; margin-right: 4px"
+      ></i>
       Updated today
     </div>
     <!-- decorative icon -->
-    <i class="pi pi-wallet" style="position:absolute; right:20px; bottom:18px; font-size:48px; opacity:0.12; color:white;"></i>
+    <i
+      class="pi pi-wallet"
+      style="
+        position: absolute;
+        right: 20px;
+        bottom: 18px;
+        font-size: 48px;
+        opacity: 0.12;
+        color: white;
+      "
+    ></i>
   </div>
 
   <!-- ── Mini Stat Grid ── -->
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
-
+  <div
+    style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    "
+  >
     <div class="stat-mini">
       <div class="stat-mini__icon-wrap icon-green">
         <i class="pi pi-arrow-up"></i>
       </div>
       <div>
         <div class="stat-mini__label">Income</div>
-        <div class="stat-mini__value">${{ stats.totalIncomes | number:'1.2-2' }}</div>
+        <div class="stat-mini__value">
+          ${{ stats.totalIncomes | number: "1.2-2" }}
+        </div>
       </div>
     </div>
 
@@ -39,7 +74,9 @@
       </div>
       <div>
         <div class="stat-mini__label">Expenses</div>
-        <div class="stat-mini__value">${{ stats.totalExpenses | number:'1.2-2' }}</div>
+        <div class="stat-mini__value">
+          ${{ stats.totalExpenses | number: "1.2-2" }}
+        </div>
       </div>
     </div>
 
@@ -49,7 +86,9 @@
       </div>
       <div>
         <div class="stat-mini__label">This Month</div>
-        <div class="stat-mini__value">${{ stats.currentMonthExpenses | number:'1.2-2' }}</div>
+        <div class="stat-mini__value">
+          ${{ stats.currentMonthExpenses | number: "1.2-2" }}
+        </div>
       </div>
     </div>
 
@@ -65,37 +104,68 @@
   </div>
 
   <!-- ── Budget Progress ── -->
-  <div class="card" style="margin-bottom: 16px;">
+  <div class="card" style="margin-bottom: 16px">
     <div class="section-header">
       <div class="section-title">Monthly Budget</div>
-      <a routerLink="/budgets" class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
-        View all <i class="pi pi-arrow-right" style="font-size:11px;"></i>
+      <a
+        routerLink="/budgets"
+        class="btn btn-ghost"
+        style="font-size: 12px; padding: 6px 12px"
+      >
+        View all <i class="pi pi-arrow-right" style="font-size: 11px"></i>
       </a>
     </div>
     <div class="progress-track">
-      <div class="progress-fill"
-           [style.width.%]="Math.min(budgetPercentage, 100)"
-           [style.background]="budgetPercentage > 90 ? 'var(--danger-500)' : budgetPercentage > 70 ? 'var(--warning-500)' : 'var(--brand-500)'">
-      </div>
+      <div
+        class="progress-fill"
+        [style.width.%]="Math.min(budgetPercentage, 100)"
+        [style.background]="
+          budgetPercentage > 90
+            ? 'var(--danger-500)'
+            : budgetPercentage > 70
+              ? 'var(--warning-500)'
+              : 'var(--brand-500)'
+        "
+      ></div>
     </div>
-    <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:var(--gray-500);">
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--gray-500);
+      "
+    >
       <span>{{ budgetPercentage }}% used</span>
-      <span [style.color]="budgetPercentage > 90 ? 'var(--danger-text)' : 'var(--success-text)'">
+      <span
+        [style.color]="
+          budgetPercentage > 90 ? 'var(--danger-text)' : 'var(--success-text)'
+        "
+      >
         {{ 100 - budgetPercentage }}% remaining
       </span>
     </div>
   </div>
 
   <!-- ── Charts Row ── -->
-  <div style="display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:16px;">
-
+  <div
+    style="
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    "
+  >
     <div class="card">
-      <div class="section-title" style="margin-bottom:16px;">Expenses by Category</div>
+      <div class="section-title" style="margin-bottom: 16px">
+        Expenses by Category
+      </div>
       <canvas #expenseChart></canvas>
     </div>
 
     <div class="card">
-      <div class="section-title" style="margin-bottom:16px;">Monthly Trend</div>
+      <div class="section-title" style="margin-bottom: 16px">Monthly Trend</div>
       <canvas #trendChart></canvas>
     </div>
   </div>
@@ -104,29 +174,53 @@
   <div class="card">
     <div class="section-header">
       <div class="section-title">Recent Transactions</div>
-      <a routerLink="/expenses" class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
-        See all <i class="pi pi-arrow-right" style="font-size:11px;"></i>
+      <a
+        routerLink="/expenses"
+        class="btn btn-ghost"
+        style="font-size: 12px; padding: 6px 12px"
+      >
+        See all <i class="pi pi-arrow-right" style="font-size: 11px"></i>
       </a>
     </div>
 
     <div *ngIf="stats.recentTransactions?.length > 0">
       <div *ngFor="let txn of stats.recentTransactions" class="txn-row">
-        <div class="txn-icon"
-             [style.background]="(txn.amount && txn.amount < 0) ? 'var(--success-bg)' : 'var(--danger-bg)'"
-             [style.color]="(txn.amount && txn.amount < 0) ? 'var(--success-text)' : 'var(--danger-text)'">
-          <i class="pi" [class.pi-arrow-up]="txn.amount && txn.amount < 0" [class.pi-arrow-down]="!txn.amount || txn.amount >= 0"></i>
+        <div
+          class="txn-icon"
+          [style.background]="
+            txn.amount && txn.amount < 0
+              ? 'var(--success-bg)'
+              : 'var(--danger-bg)'
+          "
+          [style.color]="
+            txn.amount && txn.amount < 0
+              ? 'var(--success-text)'
+              : 'var(--danger-text)'
+          "
+        >
+          <i
+            class="pi"
+            [class.pi-arrow-up]="txn.amount && txn.amount < 0"
+            [class.pi-arrow-down]="!txn.amount || txn.amount >= 0"
+          ></i>
         </div>
         <div class="txn-info">
-          <div class="txn-name">{{ txn.merchantName || txn.note || 'Transaction' }}</div>
+          <div class="txn-name">
+            {{ txn.merchantName || txn.note || "Transaction" }}
+          </div>
           <div class="txn-meta">
-            {{ txn.expenseDate || txn.incomeDate | date:'MMM d' }} &bull;
-            {{ txn.category?.name || 'Uncategorized' }}
+            {{ txn.expenseDate || txn.incomeDate | date: "MMM d" }} &bull;
+            {{ txn.category?.name || "Uncategorized" }}
           </div>
         </div>
-        <div class="txn-amount"
-             [class.txn-amount--out]="!txn.amount || txn.amount >= 0"
-             [class.txn-amount--in]="txn.amount && txn.amount < 0">
-          {{ (txn.amount && txn.amount >= 0) ? '-' : '+' }}${{ Math.abs(txn.amount || 0) | number:'1.2-2' }}
+        <div
+          class="txn-amount"
+          [class.txn-amount--out]="!txn.amount || txn.amount >= 0"
+          [class.txn-amount--in]="txn.amount && txn.amount < 0"
+        >
+          {{ txn.amount && txn.amount >= 0 ? "-" : "+" }}${{
+            Math.abs(txn.amount || 0) | number: "1.2-2"
+          }}
         </div>
       </div>
     </div>
@@ -140,5 +234,4 @@
       </a>
     </div>
   </div>
-
 </div>
