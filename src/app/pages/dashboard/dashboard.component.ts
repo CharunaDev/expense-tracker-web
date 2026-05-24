@@ -10,9 +10,10 @@ import {
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { Chart, registerables } from "chart.js";
-import { ApiService } from "../../services/api.service";
 import { AuthService } from "../../services/auth.service";
 import { User } from "../../models/user.model";
+import { DashboardService } from "../../services/dashboard.service";
+import { BudgetService } from "../../services/budget.service";
 
 Chart.register(...registerables);
 
@@ -46,7 +47,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private chartsInitialized = false;
 
   constructor(
-    private apiService: ApiService,
+    private dashboardService: DashboardService,
+    private budgetService: BudgetService,
     private authService: AuthService,
   ) {}
 
@@ -76,7 +78,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loadDashboardData() {
     this.isLoading = true;
 
-    this.apiService.getDashboardData().subscribe({
+    this.dashboardService.getDashboardData().subscribe({
       next: (data) => {
         this.stats = data;
         this.isLoading = false;
@@ -106,7 +108,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
 
-    this.apiService.getBudgets(currentYear, currentMonth).subscribe({
+    this.budgetService.getBudgets(currentYear, currentMonth).subscribe({
       next: (budgets) => {
         const totalBudget = budgets.reduce((sum, b) => sum + b.budgetAmount, 0);
         if (totalBudget > 0) {

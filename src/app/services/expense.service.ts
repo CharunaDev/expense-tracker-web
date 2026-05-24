@@ -1,40 +1,49 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { environment } from "../environments/environment";
-import { Expense } from "../models/expense.model";
+import {
+  Expense,
+  CreateExpenseDto,
+  UpdateExpenseDto,
+  ExpenseFilters,
+} from "../models/expense.model";
 
 @Injectable({
   providedIn: "root",
 })
 export class ExpenseService {
-  private baseUrl = `${environment.apiUrl}/Expense`;
+  private baseUrl = `${environment.apiUrl}/expenses`;
 
   constructor(private http: HttpClient) {}
 
-  getExpenses(filters?: any): Observable<Expense[]> {
-    let params = new HttpParams();
-
+  getExpenses(filters?: ExpenseFilters): Observable<Expense[]> {
+    let params = new URLSearchParams();
     if (filters) {
-      Object.keys(filters).forEach((key) => {
-        if (filters[key] !== null && filters[key] !== undefined) {
-          params = params.set(key, filters[key]);
-        }
-      });
+      if (filters.startDate)
+        params.append("startDate", filters.startDate.toISOString());
+      if (filters.endDate)
+        params.append("endDate", filters.endDate.toISOString());
+      if (filters.categoryId)
+        params.append("categoryId", filters.categoryId.toString());
+      if (filters.accountId)
+        params.append("accountId", filters.accountId.toString());
     }
-
-    return this.http.get<Expense[]>(this.baseUrl, { params });
+    const queryString = params.toString();
+    return this.http.get<Expense[]>(
+      `${this.baseUrl}${queryString ? `?${queryString}` : ""}`,
+    );
   }
 
   getExpenseById(id: number): Observable<Expense> {
     return this.http.get<Expense>(`${this.baseUrl}/${id}`);
   }
 
-  createExpense(expense: Partial<Expense>): Observable<Expense> {
+  createExpense(expense: CreateExpenseDto): Observable<Expense> {
     return this.http.post<Expense>(this.baseUrl, expense);
   }
 
-  updateExpense(id: number, expense: Partial<Expense>): Observable<Expense> {
+  updateExpense(id: number, expense: UpdateExpenseDto): Observable<Expense> {
     return this.http.put<Expense>(`${this.baseUrl}/${id}`, expense);
   }
 

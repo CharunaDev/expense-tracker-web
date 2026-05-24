@@ -1,40 +1,36 @@
 import { Account } from "./account.model";
 import { Category } from "./category.model";
 
-export interface Expense {
+export interface Income {
   id: number;
   userId: number;
   categoryId: number;
   accountId: number;
-  receiptId?: number;
   amount: number;
-  expenseDate: Date;
-  merchantName: string;
+  incomeDate: Date;
   note: string;
   isActive: boolean;
   category?: Category;
   account?: Account;
 }
 
-export interface CreateExpenseDto {
+export interface CreateIncomeDto {
   categoryId: number;
   accountId: number;
   amount: number;
-  expenseDate: Date;
-  merchantName: string;
+  incomeDate: Date;
   note: string;
 }
 
-export interface UpdateExpenseDto {
+export interface UpdateIncomeDto {
   categoryId: number;
   accountId: number;
   amount: number;
-  expenseDate: Date;
-  merchantName: string;
+  incomeDate: Date;
   note: string;
 }
 
-export interface ExpenseFilters {
+export interface IncomeFilters {
   startDate?: Date;
   endDate?: Date;
   categoryId?: number;

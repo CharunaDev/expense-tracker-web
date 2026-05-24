@@ -28,3 +28,15 @@ export interface AuthResponse {
   user: User;
   roles: string[];
 }
+
+export interface UserRoleDto {
+  userId: number;
+  userEmail: string;
+  userDisplayName: string;
+  roles: string[];
+}
+
+export interface AssignRoleDto {
+  userId: number;
+  roleId: number;
+}

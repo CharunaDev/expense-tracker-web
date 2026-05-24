@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormsModule,
@@ -7,9 +7,8 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { ApiService } from "../../services/api.service";
-import { Account } from "../../models/expense.model";
 import { AccountService } from "../../services/account.service";
+import { Account } from "../../models/account.model";
 
 @Component({
   selector: "app-accounts",
@@ -25,7 +24,7 @@ export class AccountsComponent implements OnInit {
   totalBalance = 0;
 
   constructor(
-    private apiService: ApiService,
+    private cdr: ChangeDetectorRef,
     private accountService: AccountService,
     private fb: FormBuilder,
   ) {
@@ -51,9 +50,11 @@ export class AccountsComponent implements OnInit {
           (sum, a) => sum + a.currentBalance,
           0,
         );
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("API ERROR:", err);
+        this.cdr.detectChanges();
       },
       complete: () => {
         console.log("REQUEST COMPLETED");

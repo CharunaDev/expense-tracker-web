@@ -1,14 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
-import { Category } from '../../models/expense.model';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
+import { Category } from "../../models/category.model";
+import { CategoryService } from "../../services/category.service";
 
 @Component({
-  selector: 'app-categories',
+  selector: "app-categories",
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './categories.component.html'
+  templateUrl: "./categories.component.html",
 })
 export class CategoriesComponent implements OnInit {
   categories: Category[] = [];
@@ -16,15 +22,15 @@ export class CategoriesComponent implements OnInit {
   showModal = false;
   editingCategory: Category | null = null;
   categoryForm: FormGroup;
-  activeTab: 'expense' | 'income' = 'expense';
+  activeTab: "expense" | "income" = "expense";
 
   constructor(
-    private apiService: ApiService,
-    private fb: FormBuilder
+    private categoryService: CategoryService,
+    private fb: FormBuilder,
   ) {
     this.categoryForm = this.fb.group({
-      name: ['', Validators.required],
-      type: ['expense', Validators.required]
+      name: ["", Validators.required],
+      type: ["expense", Validators.required],
     });
   }
 
@@ -33,14 +39,16 @@ export class CategoriesComponent implements OnInit {
   }
 
   loadCategories() {
-    this.apiService.getCategories().subscribe(categories => {
+    this.categoryService.getCategories().subscribe((categories) => {
       this.categories = categories;
       this.filterCategories();
     });
   }
 
   filterCategories() {
-    this.filteredCategories = this.categories.filter(c => c.type === this.activeTab);
+    this.filteredCategories = this.categories.filter(
+      (c) => c.type === this.activeTab,
+    );
   }
 
   openCategoryModal(category?: Category) {
@@ -48,7 +56,7 @@ export class CategoriesComponent implements OnInit {
     if (category) {
       this.categoryForm.patchValue({
         name: category.name,
-        type: category.type
+        type: category.type,
       });
     } else {
       this.categoryForm.reset({ type: this.activeTab });
@@ -63,7 +71,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   closeModalOnBackdrop(event: MouseEvent) {
-    if ((event.target as HTMLElement).classList.contains('fixed')) {
+    if ((event.target as HTMLElement).classList.contains("fixed")) {
       this.closeModal();
     }
   }
@@ -71,14 +79,16 @@ export class CategoriesComponent implements OnInit {
   saveCategory() {
     if (this.categoryForm.valid) {
       const categoryData = this.categoryForm.value;
-      
+
       if (this.editingCategory) {
-        this.apiService.updateCategory(this.editingCategory.id, categoryData).subscribe(() => {
-          this.loadCategories();
-          this.closeModal();
-        });
+        this.categoryService
+          .updateCategory(this.editingCategory.id, categoryData)
+          .subscribe(() => {
+            this.loadCategories();
+            this.closeModal();
+          });
       } else {
-        this.apiService.createCategory(categoryData).subscribe(() => {
+        this.categoryService.createCategory(categoryData).subscribe(() => {
           this.loadCategories();
           this.closeModal();
         });
@@ -91,8 +101,12 @@ export class CategoriesComponent implements OnInit {
   }
 
   deleteCategory(id: number) {
-    if (confirm('Are you sure you want to delete this category? This will affect all related transactions.')) {
-      this.apiService.deleteCategory(id).subscribe(() => {
+    if (
+      confirm(
+        "Are you sure you want to delete this category? This will affect all related transactions.",
+      )
+    ) {
+      this.categoryService.deleteCategory(id).subscribe(() => {
         this.loadCategories();
       });
     }

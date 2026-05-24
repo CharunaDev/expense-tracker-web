@@ -1,39 +1,45 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment } from "../environments/environment";
-import { Category } from "../models/expense.model";
+import {
+  Category,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "../models/category.model";
 
 @Injectable({
   providedIn: "root",
 })
 export class CategoryService {
-  private baseUrl = `${environment.apiUrl}/Category`;
+  private readonly baseUrl = `${environment.apiUrl}/categories`;
 
   constructor(private http: HttpClient) {}
 
-  getCategories(type?: string): Observable<Category[]> {
-    let url = this.baseUrl;
-
+  getCategories(type?: "expense" | "income"): Observable<Category[]> {
+    let params = new HttpParams();
     if (type) {
-      url += `?type=${type}`;
+      params = params.set("type", type);
     }
-
-    return this.http.get<Category[]>(url);
+    return this.http.get<Category[]>(this.baseUrl, { params });
   }
 
-  createCategory(category: Partial<Category>): Observable<Category> {
-    return this.http.post<Category>(this.baseUrl, category);
+  getCategoryById(id: number): Observable<Category> {
+    return this.http.get<Category>(`${this.baseUrl}/${id}`);
+  }
+
+  createCategory(category: CreateCategoryDto): Observable<Category> {
+    return this.http.post<Category>(this.baseUrl, category, {});
   }
 
   updateCategory(
     id: number,
-    category: Partial<Category>,
+    category: UpdateCategoryDto,
   ): Observable<Category> {
-    return this.http.put<Category>(`${this.baseUrl}/${id}`, category);
+    return this.http.put<Category>(`${this.baseUrl}/${id}`, category, {});
   }
 
-  deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }
